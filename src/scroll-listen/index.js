@@ -1,51 +1,26 @@
 import React from 'react'
 import classNames from 'classnames'
-import { changeActiveTitle } from '../actions'
 import './index.scss'
 
 export default class ScrollListen extends React.Component {
     constructor(props) {
         super(props)
-        this.state = {
-            nails: []
-        }
-    }
-
-    componentWillMount() {
-        //this.store = this.getParentStore(this.props.parent)
-        //this.unsubscribe = this.store.subscribe(() => {
-        //    this.setState({
-        //        nails: this.store.getState().Nail.infos
-        //    })
-        //})
-    }
-
-    componentWillUnmount() {
-        this.unsubscribe()
-    }
-
-    getParentStore(parent) {
-        if (parent.props.type.name !== 'ScrollListenContainer') {
-            return this.getParentStore(parent.props.parent)
-        } else {
-            return parent.store
-        }
     }
 
     handleClick(value) {
-        store.dispatch(changeActiveTitle(value))
+        this.props.onChange(value)
     }
 
     render() {
-        let Children = this.state.nails.map((item, index)=> {
+        let Children = this.props.titles.map((item, index)=> {
             let itemClass = classNames({
                 item: true,
-                active: this.props.activeTitle === item.title
+                active: this.props.activeKey === item.key
             })
             return (
                 <div key={index}
-                     onClick={this.handleClick.bind(this,item.title)}
-                     className={itemClass}>{item.title}</div>
+                     onClick={this.handleClick.bind(this,item.key)}
+                     className={itemClass}>{item.name}</div>
             )
         })
 
@@ -58,6 +33,13 @@ export default class ScrollListen extends React.Component {
 }
 
 ScrollListen.defaultProps = {
-    // @desc 当前激活的title
-    activeTitle: ''
+    // @desc title数组
+    titles: [],
+
+    // @desc 点击选择的回调
+    onChange: ()=> {
+    },
+
+    // @desc 当前激活的key
+    activeKey: ''
 }
