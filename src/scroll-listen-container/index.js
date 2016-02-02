@@ -1,4 +1,5 @@
 import React from 'react'
+import { findTreeByName, getTargetByTree } from '../find-tree-by-name'
 
 export default class ScrollListenContainer extends React.Component {
     constructor(props) {
@@ -25,48 +26,36 @@ export default class ScrollListenContainer extends React.Component {
         this.refs['box'].scrollTo(key)
     }
 
-    getChildrenByName(parent, childrenName, index = 0) {
-        // 搜索树最大10层
-        if (index > 10)return
-        if (this.findTree.length + 1 < index) {
-            this.findTree.push(parent)
-        } else {
-            this.findTree[index] = parent
-        }
-
-        React.Children.map(parent, (item)=> {
-            if (this[childrenName] !== null)return
-            if (item.type && item.type.name === childrenName) {
-                this[childrenName] = item
-            } else if (item.props && item.props.children) {
-                this.getChildrenByName(item.props.children, childrenName, index + 1)
-            }
-        })
-    }
-
     render() {
-        this.findTree = []
-        this.getChildrenByName(this.props.children, 'ScrollListenBox')
-        // 如果最后一个不是,则去除
-        if (!this.findTree[this.findTree.length - 1].type || this.findTree[this.findTree.length - 1].type.name !== 'ScrollListenBox') {
-            this.findTree.pop()
-        }
+        let boxFindTree = findTreeByName(this.props.children, 'ScrollListenBox')
+        let listenFindTree = findTreeByName(this.props.children, 'ScrollListen')
+
+        let boxChildren = getTargetByTree(boxFindTree)
+        let listenChildren = getTargetByTree(listenFindTree)
+
+        // 生成titles
+        let titles = []
+        let nailFindTree = findTreeByName(boxChildren.props.children, 'ScrollListenNail')
+        console.log(nailFindTree)
+
+        //React.Children.map(item.props.children, (nailItem, index)=> {
+        //    if (nailItem.type.name !== 'ScrollListenNail')return
+        //    titles.push({
+        //        key: index,
+        //        name: nailItem.props.title
+        //    })
+        //})
+
+
+        //let MergedChildren = this.findTree.map((children)=> {
+        //    let props = Object.assign({}, children.props)
+        //    return React.cloneElement(children, props)
+        //})
+
         //console.log(this.findTree)
         //this.getChildrenByName(this.props.children, 'ScrollListen')
         //console.log(this.ScrollListenBox)
 
-        // 生成titles
-        let titles = []
-        React.Children.map(this.props.children, (item)=> {
-            if (item.type.name !== 'ScrollListenBox') return
-            React.Children.map(item.props.children, (nailItem, index)=> {
-                if (nailItem.type.name !== 'ScrollListenNail')return
-                titles.push({
-                    key: index,
-                    name: nailItem.props.title
-                })
-            })
-        })
 
         let Children = React.Children.map(this.props.children, (item)=> {
             let props = Object.assign({}, item.props)

@@ -21,7 +21,6 @@ export default class ScrollListenBox extends React.Component {
         let topIndex = -1
         let currentKey = ''
         newNailArray.map((item)=> {
-            console.log(item.top - domTop - this.$scrollParent.scrollTop())
             if (scrollTop > item.top - domTop - this.$scrollParent.scrollTop() - 1) {
                 if (topIndex === 1)return
                 topIndex = 0
