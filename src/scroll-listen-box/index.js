@@ -1,17 +1,53 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
+import { CHANGE_ACTIVE_TITLE, CHANGE_BOX_ACTIVE_TITLE, SET_NAIL_INFO, changeActiveTitle } from '../actions'
 
 export default class ScrollListenBox extends React.Component {
     constructor(props) {
         super(props)
-        this.state = {
-            nailArray: []
+    }
+
+    componentWillMount() {
+        this.nailArray = []
+
+        this.unsubscribe = this.props.store.subscribe(() => {
+            switch (this.props.store.getState().LastAction.type) {
+            case CHANGE_ACTIVE_TITLE:
+                break
+            case CHANGE_BOX_ACTIVE_TITLE:
+                this.scrollTo(this.props.store.getState().Nail.title)
+                break
+            case SET_NAIL_INFO:
+                this.nailArray = this.props.store.getState().Nail.infos
+                break
+            }
+        })
+    }
+
+    componentDidMount() {
+        this.dom = ReactDOM.findDOMNode(this)
+        this.$dom = $(this.dom)
+        this.scrollSelf = this.getScrollSelf(ReactDOM.findDOMNode(this))
+        this.scrollParent = this.getScrollParent(ReactDOM.findDOMNode(this))
+
+        // parent不能等于self
+        if (this.scrollParent === this.scrollSelf) {
+            this.scrollParent = this.getScrollParent(this.scrollParent)
         }
+
+        this.$scrollSelf = $(this.scrollSelf)
+        this.$scrollParent = $(this.scrollParent)
+        this.$scrollSelf.on('scroll', this.handleScroll.bind(this))
+    }
+
+    componentWillUnmount() {
+        this.$dom.off('scroll', this.handleScroll.bind(this))
+        this.unsubscribe()
     }
 
     handleScroll() {
-        let newNailArray = Object.assign([], this.state.nailArray)
+        let newNailArray = Object.assign([], this.nailArray)
         let domTop = this.$scrollSelf.offset().top
         let scrollTop = this.$scrollSelf.scrollTop()
         newNailArray.sort((left, right)=> {
@@ -19,12 +55,12 @@ export default class ScrollListenBox extends React.Component {
         })
 
         let topIndex = -1
-        let currentKey = ''
+        let currentTitle = ''
         newNailArray.map((item)=> {
             if (scrollTop > item.top - domTop - this.$scrollParent.scrollTop() - 1) {
                 if (topIndex === 1)return
                 topIndex = 0
-                currentKey = item.key
+                currentTitle = item.title
             } else {
                 if (topIndex === 0) {
                     topIndex = 1
@@ -33,27 +69,14 @@ export default class ScrollListenBox extends React.Component {
         })
 
         // 默认取第一个
-        if (currentKey === '' && newNailArray.length > 0) {
-            currentKey = newNailArray[0].key
+        if (currentTitle === '' && newNailArray.length > 0) {
+            currentTitle = newNailArray[0].title
         }
 
-        this.props.onScrollKeyChange && this.props.onScrollKeyChange(currentKey)
+        this.props.store.dispatch(changeActiveTitle(currentTitle))
     }
 
-    componentDidMount() {
-        this.dom = ReactDOM.findDOMNode(this)
-        this.$dom = $(this.dom)
-        this.$scrollSelf = $(this.getScrollSelf())
-        this.$scrollParent = $(this.getScrollParent())
-        this.$scrollSelf.on('scroll', this.handleScroll.bind(this))
-    }
-
-    componentWillUnmount() {
-        this.$scrollSelf.off('scroll', this.handleScroll.bind(this))
-    }
-
-    getScrollSelf() {
-        let el = ReactDOM.findDOMNode(this)
+    getScrollSelf(el) {
         do {
             switch (window.getComputedStyle(el)['overflowY']) {
             case 'auto':
@@ -66,8 +89,7 @@ export default class ScrollListenBox extends React.Component {
         return window
     }
 
-    getScrollParent() {
-        let el = ReactDOM.findDOMNode(this)
+    getScrollParent(el) {
         while (el = el.parentElement) {
             switch (window.getComputedStyle(el)['overflowY']) {
             case 'auto':
@@ -92,36 +114,26 @@ export default class ScrollListenBox extends React.Component {
     }
 
     // 手动切换滑动
-    scrollTo(key) {
-        this.state.nailArray.map((item)=> {
-            if (key === item.key) {
-                this.$dom.animate({
-                    scrollTop: item.top - this.$dom.offset().top - this.$scrollParent.scrollTop()
+    scrollTo(title) {
+        this.nailArray.map((item)=> {
+            if (title === item.title) {
+                this.$scrollSelf.animate({
+                    scrollTop: item.top - this.$scrollSelf.offset().top - this.$scrollParent.scrollTop()
                 }, 200)
             }
         })
     }
 
     render() {
-        let Children = React.Children.map(this.props.children, (item)=> {
-            let props = Object.assign({}, item.props)
-            if (item.type.name === 'ScrollListenNail') {
-                this.props.titles.map((titleItem)=> {
-                    if (titleItem.name === item.props.title) {
-                        props.key = titleItem.key
-                        props.onRender = this.handleNailRender.bind(this, titleItem.key)
-                    }
-                })
-            }
-            return React.cloneElement(item, props)
-        })
-
         return (
             <div {...this.props}>
-                {Children}
+                {this.props.children}
             </div>
         )
     }
 }
 
-ScrollListenBox.defaultProps = {}
+ScrollListenBox.defaultProps = {
+    // @desc 传入实例化的store
+    store: {}
+}

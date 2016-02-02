@@ -1,5 +1,6 @@
 import React from 'react'
 import $ from 'jquery'
+import { setNailInfo } from '../actions'
 
 export default class ScrollListenNail extends React.Component {
     constructor(props) {
@@ -10,7 +11,10 @@ export default class ScrollListenNail extends React.Component {
     componentDidMount() {
         this.$dom = $(ReactDOM.findDOMNode(this))
         setTimeout(()=> {
-            this.props.onRender(this.$dom.offset().top)
+            this.props.store.dispatch(setNailInfo({
+                title: this.props.title,
+                top: this.$dom.offset().top
+            }))
         })
     }
 
@@ -22,6 +26,6 @@ export default class ScrollListenNail extends React.Component {
 }
 
 ScrollListenNail.defaultProps = {
-    onRender: ()=> {
-    }
+    // @desc 传入实例化的store
+    store: {}
 }

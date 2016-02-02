@@ -74,5 +74,35 @@ const getTargetByTree = (findTree)=> {
     }
 }
 
+// 递归生成children
+const createChildren = (children, changeProps, deep = 0)=> {
+    let Childrens = React.Children.map(children, (item)=> {
+        let props = Object.assign({}, item.props)
+
+        if (item.props && item.props.children) {
+            let newProps = changeProps(props, item, deep)
+            if (newProps !== undefined) {
+                props = newProps
+            }
+            return React.cloneElement(item, props, createChildren(item.props.children, changeProps, deep + 1))
+        } else if (item.props && !item.props.children) {
+            let newProps = changeProps(props, item, deep)
+            if (newProps !== undefined) {
+                props = newProps
+            }
+            return React.cloneElement(item, props)
+        } else {
+            return item
+        }
+    })
+
+    // 如果是一个长度为1的数组,则去掉这个数组
+    if (Childrens.constructor.name === 'Array' && Childrens.length === 1) {
+        Childrens = Childrens[0]
+    }
+
+    return Childrens
+}
+
 export default findTreeByName
-export { findTreeByName, getTargetByTree }
+export { findTreeByName, getTargetByTree, createChildren }
