@@ -39,10 +39,17 @@ export default class ScrollListenBox extends React.Component {
         this.$scrollSelf = $(this.scrollSelf)
         this.$scrollParent = $(this.scrollParent)
         this.$scrollSelf.on('scroll', this.handleScroll.bind(this))
+        console.log(this.scrollSelf)
+        this.$scrollSelf.on('DOMNodeInserted', ()=> {
+            console.log(123)
+        })
     }
 
     componentWillUnmount() {
         this.$dom.off('scroll', this.handleScroll.bind(this))
+        this.$scrollSelf.off('DOMNodeInserted', ()=> {
+            console.log(123)
+        })
         this.unsubscribe()
     }
 
