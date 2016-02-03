@@ -2,27 +2,11 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import { CHANGE_ACTIVE_TITLE, CHANGE_BOX_ACTIVE_TITLE, SET_NAIL_INFO, changeActiveTitle, resetNailInfo } from '../actions'
+import _ from 'lodash'
 
 export default class ScrollListenBox extends React.Component {
     constructor(props) {
         super(props)
-    }
-
-    componentWillMount() {
-        this.nailArray = []
-
-        this.unsubscribe = this.props.store.subscribe(() => {
-            switch (this.props.store.getState().LastAction.type) {
-            case CHANGE_ACTIVE_TITLE:
-                break
-            case CHANGE_BOX_ACTIVE_TITLE:
-                this.scrollTo(this.props.store.getState().Nail.title)
-                break
-            case SET_NAIL_INFO:
-                this.nailArray = this.props.store.getState().Nail.infos
-                break
-            }
-        })
     }
 
     componentDidMount() {
@@ -39,13 +23,32 @@ export default class ScrollListenBox extends React.Component {
         this.$scrollSelf = $(this.scrollSelf)
         this.$scrollParent = $(this.scrollParent)
         this.$scrollSelf.on('scroll', this.handleScroll.bind(this))
-        console.log(this.scrollSelf)
-        this.$scrollSelf.on('DOMSubtreeModified', this.resetNailInfo)
+        this.$scrollSelf.on('DOMSubtreeModified', _.debounce(this.resetNailInfo.bind(this), 200))
+
+        this.nailArray = []
+
+        this.unsubscribe = this.props.store.subscribe(() => {
+            switch (this.props.store.getState().LastAction.type) {
+            case CHANGE_ACTIVE_TITLE:
+                break
+            case CHANGE_BOX_ACTIVE_TITLE:
+                this.scrollTo(this.props.store.getState().Nail.title)
+                break
+            case SET_NAIL_INFO:
+                let nowScrollTop = this.$scrollSelf.scrollTop()
+                let copyInfos = _.cloneDeep(this.props.store.getState().Nail.infos)
+                this.nailArray = copyInfos.map((item)=> {
+                    item.top += nowScrollTop
+                    return item
+                })
+                break
+            }
+        })
     }
 
     componentWillUnmount() {
         this.$dom.off('scroll', this.handleScroll.bind(this))
-        this.$scrollSelf.off('DOMSubtreeModified', this.resetNailInfo)
+        this.$scrollSelf.off('DOMSubtreeModified', _.debounce(this.resetNailInfo.bind(this), 200))
         this.unsubscribe()
     }
 
@@ -54,16 +57,12 @@ export default class ScrollListenBox extends React.Component {
     }
 
     handleScroll() {
-        let newNailArray = Object.assign([], this.nailArray)
         let domTop = this.$scrollSelf.offset().top
         let scrollTop = this.$scrollSelf.scrollTop()
-        newNailArray.sort((left, right)=> {
-            return left.top > right.top
-        })
 
         let topIndex = -1
         let currentTitle = ''
-        newNailArray.map((item)=> {
+        this.nailArray.map((item)=> {
             if (scrollTop > item.top - domTop - this.$scrollParent.scrollTop() - 1) {
                 if (topIndex === 1)return
                 topIndex = 0
@@ -76,8 +75,8 @@ export default class ScrollListenBox extends React.Component {
         })
 
         // 默认取第一个
-        if (currentTitle === '' && newNailArray.length > 0) {
-            currentTitle = newNailArray[0].title
+        if (currentTitle === '' && this.nailArray.length > 0) {
+            currentTitle = this.nailArray[0].title
         }
 
         this.props.store.dispatch(changeActiveTitle(currentTitle))
