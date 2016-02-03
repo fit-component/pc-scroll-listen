@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-import { CHANGE_ACTIVE_TITLE, CHANGE_BOX_ACTIVE_TITLE, SET_NAIL_INFO, changeActiveTitle } from '../actions'
+import { CHANGE_ACTIVE_TITLE, CHANGE_BOX_ACTIVE_TITLE, SET_NAIL_INFO, changeActiveTitle, resetNailInfo } from '../actions'
 
 export default class ScrollListenBox extends React.Component {
     constructor(props) {
@@ -40,17 +40,17 @@ export default class ScrollListenBox extends React.Component {
         this.$scrollParent = $(this.scrollParent)
         this.$scrollSelf.on('scroll', this.handleScroll.bind(this))
         console.log(this.scrollSelf)
-        this.$scrollSelf.on('DOMNodeInserted', ()=> {
-            console.log(123)
-        })
+        this.$scrollSelf.on('DOMSubtreeModified', this.resetNailInfo)
     }
 
     componentWillUnmount() {
         this.$dom.off('scroll', this.handleScroll.bind(this))
-        this.$scrollSelf.off('DOMNodeInserted', ()=> {
-            console.log(123)
-        })
+        this.$scrollSelf.off('DOMSubtreeModified', this.resetNailInfo)
         this.unsubscribe()
+    }
+
+    resetNailInfo() {
+        this.props.store.dispatch(resetNailInfo())
     }
 
     handleScroll() {

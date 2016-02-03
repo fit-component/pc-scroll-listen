@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { SET_NAIL_INFO, CHANGE_ACTIVE_TITLE, CHANGE_BOX_ACTIVE_TITLE } from './actions'
+import { SET_NAIL_INFO, CHANGE_ACTIVE_TITLE, CHANGE_BOX_ACTIVE_TITLE, RESET_NAIL_INFO } from './actions'
 import _ from 'lodash'
 
 const Nail = (state = [], action) => {
@@ -27,6 +27,11 @@ const Nail = (state = [], action) => {
     case CHANGE_BOX_ACTIVE_TITLE:
         return Object.assign({}, state, {
             title: action.title
+        })
+        break
+    case RESET_NAIL_INFO:
+        return Object.assign({}, state, {
+            infos: []
         })
         break
     default:
