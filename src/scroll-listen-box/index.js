@@ -1,5 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import classNames from 'classnames'
 import $ from 'jquery'
 import { CHANGE_ACTIVE_TITLE, CHANGE_BOX_ACTIVE_TITLE, SET_NAIL_INFO, changeActiveTitle, resetNailInfo } from '../actions'
 import _ from 'lodash'
@@ -131,9 +132,15 @@ export default class ScrollListenBox extends React.Component {
     }
 
     render() {
+        const {className, children, ...others} = this.props
+        const classes = classNames({
+            '_namespace': true,
+            [className]: className
+        })
+
         return (
-            <div {...this.props}>
-                {this.props.children}
+            <div {...others} className={classes}>
+                {children}
             </div>
         )
     }

@@ -1,5 +1,6 @@
 import React from 'react'
 import $ from 'jquery'
+import classNames from 'classnames'
 import { setNailInfo, RESET_NAIL_INFO } from '../actions'
 
 export default class ScrollListenNail extends React.Component {
@@ -36,8 +37,14 @@ export default class ScrollListenNail extends React.Component {
     }
 
     render() {
+        const {className, ...others} = this.props
+        const classes = classNames({
+            '_namespace': true,
+            [className]: className
+        })
+
         return (
-            <div {...this.props}></div>
+            <div {...others} className={classes}></div>
         )
     }
 }

@@ -38,6 +38,12 @@ export default class ScrollListen extends React.Component {
     }
 
     render() {
+        const {className, ...others} = this.props
+        const classes = classNames({
+            '_namespace': true,
+            [className]: className
+        })
+
         let Children = this.state.nails.map((item, index)=> {
             let itemClass = classNames({
                 item: true,
@@ -51,7 +57,7 @@ export default class ScrollListen extends React.Component {
         })
 
         return (
-            <div className="_namespace">
+            <div {...others} className={classes}>
                 {Children}
             </div>
         )
