@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import classNames from 'classnames'
 import { setNailInfo, RESET_NAIL_INFO } from '../actions'
