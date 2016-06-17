@@ -1,6 +1,6 @@
 {
   "name": "fit-scroll-listen",
-  "version": "3.0.8",
+  "version": "3.0.9",
   "description": "scroll listen",
   "main": "lib/index.js",
   "scripts": {
@@ -12,13 +12,6 @@
   },
   "author": "tieba",
   "license": "ISC",
-  "dependencies": {
-    "redux": "^3.4.0",
-    "lodash": "^3.10.1",
-    "react": "^15.1.0",
-    "classnames": "^2.2.3",
-    "react-dom": "^15.1.0",
-    "jquery": "^2.1.4"
-  },
+  "dependencies": {},
   "typings": "lib/index.d.ts"
 }
