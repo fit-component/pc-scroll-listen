@@ -1,6 +1,6 @@
 {
   "name": "fit-scroll-listen",
-  "version": "3.0.10",
+  "version": "3.0.12",
   "description": "scroll listen",
   "main": "lib/index.js",
   "scripts": {
@@ -15,9 +15,9 @@
   "dependencies": {
     "redux": "^3.4.0",
     "lodash": "^3.10.1",
-    "react": "^15.1.0",
+    "react": "^15.0.1",
     "classnames": "^2.2.3",
-    "react-dom": "^15.1.0",
+    "react-dom": "^15.0.1",
     "jquery": "^2.1.4"
   },
   "typings": "lib/index.d.ts"
