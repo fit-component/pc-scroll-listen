@@ -38,7 +38,7 @@ export default class ScrollListenNail extends React.Component {
     }
 
     render() {
-        const {className, ...others} = this.props
+        const {className, store, ...others} = this.props
         const classes = classNames({
             '_namespace': true,
             [className]: className

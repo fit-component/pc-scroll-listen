@@ -132,7 +132,7 @@ export default class ScrollListenBox extends React.Component {
     }
 
     render() {
-        const {className, children, ...others} = this.props
+        const {className, children, store, ...others} = this.props
         const classes = classNames({
             '_namespace': true,
             [className]: className
