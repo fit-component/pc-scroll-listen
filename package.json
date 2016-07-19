@@ -1,6 +1,6 @@
 {
   "name": "fit-scroll-listen",
-  "version": "3.0.12",
+  "version": "3.0.13",
   "description": "scroll listen",
   "main": "lib/index.js",
   "scripts": {
